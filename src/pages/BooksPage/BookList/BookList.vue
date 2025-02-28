@@ -1,30 +1,34 @@
 <script setup lang="ts">
-import { BOOKS, type Book, type BooksContext } from '@/domain/books'
+import gql from 'graphql-tag';
 import { BookListItem } from './BookListItem'
-import { inject } from 'vue'
+import { useQuery } from '@vue/apollo-composable';
+import { type GetBooksBySearchTermQuery, type GetBooksBySearchTermQueryVariables } from '@/gql/graphql';
 
-const { books, searchTerm } = inject<BooksContext>(BOOKS)!
-
-const receivedRead = (book: Book) => {
-  console.log('read', book)
-  books.value = books.value!.map((book_) => {
-    if (book_.isbn === book.isbn) {
-      return {
-        ...book_,
-        read: true,
+const GetBooksBySearchTerm = gql`
+  query GetBooksBySearchTerm($searchTerm: String) {
+    books(searchTerm: $searchTerm) {
+      isbn
+      title
+      author {
+        fullName
       }
     }
-    return book_
-  })
-}
+  }
+`
+
+const { variables, result } = useQuery<GetBooksBySearchTermQuery, GetBooksBySearchTermQueryVariables>(GetBooksBySearchTerm, {
+  searchTerm: ''
+})
+
+
 </script>
 <template>
   <div>
-    <form>
-      <input placeholder="Search books" v-model="searchTerm" />
+    <form v-if="variables?.searchTerm !== undefined">
+      <input placeholder="Search books" v-model="variables.searchTerm" />
     </form>
     <div class="table-container">
-      <table v-if="books && books.length > 0">
+      <table v-if="result?.books.length ?? 0">
         <thead>
           <tr>
             <th>isbn</th>
@@ -33,8 +37,8 @@ const receivedRead = (book: Book) => {
           </tr>
         </thead>
         <tbody>
-          <template v-for="book in books" :key="book.isbn">
-            <BookListItem :book="book" @read="receivedRead($event)" />
+          <template v-for="book in result?.books" :key="book.isbn">
+            <BookListItem :book="book"/>
           </template>
         </tbody>
       </table>

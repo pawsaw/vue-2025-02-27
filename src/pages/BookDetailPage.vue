@@ -1,27 +1,40 @@
 <script setup lang="ts">
-import { BOOKS, type BooksContext, type Book } from '@/domain/books'
-import { inject, onMounted, ref, watch } from 'vue'
+import { type Book } from '@/domain/books'
+import { onMounted, watch } from 'vue'
+import { useQuery } from '@vue/apollo-composable'
+import gql from 'graphql-tag'
+import type { GetBookByIsbnQuery, GetBookByIsbnQueryVariables } from '@/gql/graphql'
+
+const GetBookByIsbn = gql`
+  query GetBookByIsbn($isbn: String!) {
+    book(isbn: $isbn) {
+      title
+    }
+  }
+`
 
 const props = defineProps<{
   isbn: Book['isbn']
 }>()
 
-const book = ref<Book | null>(null)
-const { findByISBN, loading } = inject<BooksContext>(BOOKS)!
+const { result, loading, refetch } = useQuery<GetBookByIsbnQuery, GetBookByIsbnQueryVariables>(GetBookByIsbn, {
+  isbn: props.isbn
+})
+
+
 onMounted(() => {
-  book.value = findByISBN(props.isbn)
 })
 
 watch(
   () => props.isbn,
   (newIsbn) => {
-    book.value = findByISBN(newIsbn)
+    refetch({ isbn: newIsbn})
   },
 )
 </script>
 <template>
   <h2>ISBN: {{ isbn }}</h2>
   <div v-if="!loading">
-    <h3>{{ book?.title }}</h3>
+    <h3>{{ result?.book.title }}</h3>
   </div>
 </template>
