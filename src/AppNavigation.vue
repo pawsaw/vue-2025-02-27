@@ -13,12 +13,12 @@ const navigation = ref<Navigation[]>(exampleNavigation)
     <img :class="['logo']" :src="logo" alt="Bild" />
     <ul>
       <li>
-        <RouterLink active-class="active" :to="navigation[0].link">{{
+        <RouterLink active-class="active" :to="{ name: navigation[0].link }">{{
           navigation[0].label
         }}</RouterLink>
       </li>
       <li>
-        <RouterLink active-class="active" :to="navigation[1].link">{{
+        <RouterLink active-class="active" :to="{ name: navigation[1].link }">{{
           navigation[1].label
         }}</RouterLink>
       </li>

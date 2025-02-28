@@ -1,25 +1,21 @@
 <script setup lang="ts">
-import { useBook, type Book } from '@/domain/books'
-import { onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { BOOKS, type BooksContext, type Book } from '@/domain/books'
+import { inject, onMounted, ref, watch } from 'vue'
 
-interface Params {
+const props = defineProps<{
   isbn: Book['isbn']
-}
+}>()
 
-const isbn = ref<Book['isbn'] | null>(null)
-const { book, loading } = useBook(isbn)
-
-const route = useRoute()
-
+const book = ref<Book | null>(null)
+const { findByISBN, loading } = inject<BooksContext>(BOOKS)!
 onMounted(() => {
-  isbn.value = (route.params as unknown as Params).isbn
+  book.value = findByISBN(props.isbn)
 })
 
 watch(
-  () => (route.params as unknown as Params).isbn,
+  () => props.isbn,
   (newIsbn) => {
-    isbn.value = newIsbn
+    book.value = findByISBN(newIsbn)
   },
 )
 </script>

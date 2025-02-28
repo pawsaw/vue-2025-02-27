@@ -3,7 +3,7 @@ import type { Navigation } from './Navigation'
 export const exampleNavigation: Navigation[] = [
   {
     label: 'Books',
-    link: 'books',
+    link: 'books-list',
   },
   {
     label: 'About',

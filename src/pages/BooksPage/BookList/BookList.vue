@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useBooks, type Book } from '@/domain/books'
+import { BOOKS, type Book, type BooksContext } from '@/domain/books'
 import { BookListItem } from './BookListItem'
+import { inject } from 'vue'
 
-const { books, searchTerm } = useBooks('http://localhost:4730/books')
+const { books, searchTerm } = inject<BooksContext>(BOOKS)!
 
 const receivedRead = (book: Book) => {
   console.log('read', book)
